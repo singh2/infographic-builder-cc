@@ -14,13 +14,34 @@ Environment:
     GEMINI_ANALYSIS_MODEL       Optional. Default: gemini-2.0-flash
 """
 
+from __future__ import annotations
+
 import argparse
 import os
 import sys
 from pathlib import Path
+from typing import Any
+
+GENERATION_MODELS = [
+    "gemini-3.1-flash-image-preview",
+    "gemini-3-pro-image-preview",
+]
+
+MIME_TYPES: dict[str, str] = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+}
 
 
-def get_client():
+def _mime_type(path: Path) -> str:
+    """Detect MIME type from file extension."""
+    return MIME_TYPES.get(path.suffix.lower(), "image/png")
+
+
+def get_client() -> Any:
     """Create a Gemini API client."""
     api_key = os.environ.get("GOOGLE_API_KEY")
     if not api_key:
@@ -32,20 +53,14 @@ def get_client():
     return genai.Client(api_key=api_key)
 
 
-def read_prompt(args):
+def read_prompt(args: argparse.Namespace) -> str:
     """Read prompt from --prompt or --prompt-file."""
     if getattr(args, "prompt_file", None):
         return Path(args.prompt_file).read_text().strip()
     return args.prompt
 
 
-GENERATION_MODELS = [
-    "gemini-3.1-flash-image-preview",
-    "gemini-3-pro-image-preview",
-]
-
-
-def _generate_once(client, model, contents):
+def _generate_once(client: Any, model: str, contents: list[Any]) -> bytes | None:
     """Attempt image generation with a single model. Returns image bytes or None."""
     from google.genai import types
 
@@ -64,7 +79,7 @@ def _generate_once(client, model, contents):
     return None
 
 
-def cmd_generate(args):
+def cmd_generate(args: argparse.Namespace) -> None:
     """Generate an image using Gemini, with automatic model fallback."""
     from google.genai import types
     from google.genai.errors import APIError
@@ -72,15 +87,19 @@ def cmd_generate(args):
     client = get_client()
     prompt = read_prompt(args)
 
-    contents = []
+    contents: list[Any] = []
 
     if args.reference:
         ref_path = Path(args.reference)
         if not ref_path.exists():
-            print(f"Error: Reference image not found: {args.reference}", file=sys.stderr)
+            print(
+                f"Error: Reference image not found: {args.reference}", file=sys.stderr
+            )
             sys.exit(1)
         contents.append(
-            types.Part.from_bytes(data=ref_path.read_bytes(), mime_type="image/png")
+            types.Part.from_bytes(
+                data=ref_path.read_bytes(), mime_type=_mime_type(ref_path)
+            )
         )
 
     contents.append(prompt)
@@ -89,7 +108,7 @@ def cmd_generate(args):
     env_model = os.environ.get("GEMINI_GENERATION_MODEL")
     models = [env_model] if env_model else GENERATION_MODELS
 
-    last_error = None
+    last_error: str | None = None
     for model in models:
         try:
             print(f"Using model: {model}", file=sys.stderr)
@@ -110,9 +129,10 @@ def cmd_generate(args):
     sys.exit(1)
 
 
-def cmd_analyze(args):
+def cmd_analyze(args: argparse.Namespace) -> None:
     """Analyze an image using Gemini vision."""
     from google.genai import types
+    from google.genai.errors import APIError
 
     client = get_client()
     prompt = read_prompt(args)
@@ -123,51 +143,60 @@ def cmd_analyze(args):
         print(f"Error: Image not found: {args.image}", file=sys.stderr)
         sys.exit(1)
 
-    response = client.models.generate_content(
-        model=model,
-        contents=[
-            types.Part.from_bytes(
-                data=img_path.read_bytes(), mime_type="image/png"
-            ),
-            prompt,
-        ],
-    )
+    try:
+        response = client.models.generate_content(
+            model=model,
+            contents=[
+                types.Part.from_bytes(
+                    data=img_path.read_bytes(), mime_type=_mime_type(img_path)
+                ),
+                prompt,
+            ],
+        )
+        print(response.text)
+    except APIError as e:
+        print(f"Error: Analysis failed: {e}", file=sys.stderr)
+        sys.exit(1)
 
-    print(response.text)
 
-
-def cmd_compare(args):
+def cmd_compare(args: argparse.Namespace) -> None:
     """Compare two images using Gemini vision."""
     from google.genai import types
+    from google.genai.errors import APIError
 
     client = get_client()
     prompt = read_prompt(args)
     model = os.environ.get("GEMINI_ANALYSIS_MODEL", "gemini-2.0-flash")
 
-    for p in [args.image1, args.image2]:
-        if not Path(p).exists():
+    img1_path = Path(args.image1)
+    img2_path = Path(args.image2)
+    for p in [img1_path, img2_path]:
+        if not p.exists():
             print(f"Error: Image not found: {p}", file=sys.stderr)
             sys.exit(1)
 
-    response = client.models.generate_content(
-        model=model,
-        contents=[
-            "Image 1 (style anchor):",
-            types.Part.from_bytes(
-                data=Path(args.image1).read_bytes(), mime_type="image/png"
-            ),
-            "Image 2 (panel under review):",
-            types.Part.from_bytes(
-                data=Path(args.image2).read_bytes(), mime_type="image/png"
-            ),
-            prompt,
-        ],
-    )
+    try:
+        response = client.models.generate_content(
+            model=model,
+            contents=[
+                "Image 1 (style anchor):",
+                types.Part.from_bytes(
+                    data=img1_path.read_bytes(), mime_type=_mime_type(img1_path)
+                ),
+                "Image 2 (panel under review):",
+                types.Part.from_bytes(
+                    data=img2_path.read_bytes(), mime_type=_mime_type(img2_path)
+                ),
+                prompt,
+            ],
+        )
+        print(response.text)
+    except APIError as e:
+        print(f"Error: Comparison failed: {e}", file=sys.stderr)
+        sys.exit(1)
 
-    print(response.text)
 
-
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Gemini image generation and analysis for infographics"
     )
