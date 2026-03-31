@@ -1,0 +1,10 @@
+{
+  "name": "infographic-builder",
+  "description": "Generate publication-ready infographics from any topic using Gemini image generation",
+  "version": "0.1.0",
+  "author": {
+    "name": "Gurkaran Singh"
+  },
+  "license": "MIT",
+  "keywords": ["infographic", "image-generation", "gemini", "design", "visualization"]
+}
