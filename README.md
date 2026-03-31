@@ -34,37 +34,38 @@ This is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin t
 
 ### 1. Prerequisites
 
-You need three things:
-
 | Prerequisite | Check |
 |---|---|
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `claude --version` |
 | Python 3.11+ | `python3 --version` |
 | Google API key ([get one](https://aistudio.google.com/apikey)) | Gemini API enabled |
 
-### 2. Clone and install
+### 2. Install the plugin
 
-```bash
-git clone https://github.com/singh2/infographic-builder-cc.git
-cd infographic-builder-cc
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+Run these in Claude Code (one-time setup):
+
+```
+/plugin marketplace add singh2/infographic-builder-cc
+/plugin install infographic-builder@infographic-builder
 ```
 
-### 3. Set your API key
+This installs to **user scope**, so the plugin is available in every Claude Code session — regardless of which project you're working in.
+
+### 3. Install Python dependencies
+
+```bash
+pip install google-genai pillow
+```
+
+### 4. Set your API key
+
+Add this to your `~/.zshrc` or `~/.bashrc`:
 
 ```bash
 export GOOGLE_API_KEY="your-key-here"
 ```
 
-Add to `~/.zshrc` or `~/.bashrc` to make it permanent.
-
-### 4. Launch Claude Code with the plugin
-
-```bash
-claude --plugin-dir /path/to/infographic-builder-cc
-```
+Then restart your terminal (or `source ~/.zshrc`) for it to take effect.
 
 ### 5. Try it
 
@@ -80,6 +81,27 @@ You'll get back `.png` file(s), a design rationale, and suggestions for refineme
 > ```
 > Create an infographic about the history of the internet in claymation style
 > ```
+
+### Updating
+
+When a new version is released, Claude Code will pick it up automatically if you have auto-update enabled for the marketplace. You can also update manually:
+
+```
+/plugin marketplace update
+```
+
+### Alternative: local development
+
+If you want to hack on the plugin itself, clone and run directly:
+
+```bash
+git clone https://github.com/singh2/infographic-builder-cc.git
+cd infographic-builder-cc
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+claude --plugin-dir /path/to/infographic-builder-cc
+```
 
 ## Examples
 
@@ -272,7 +294,7 @@ User: "Create an infographic about photosynthesis"
 |---------|-----|
 | `GOOGLE_API_KEY` error | `export GOOGLE_API_KEY=your-key` — the #1 first-run issue |
 | `ModuleNotFoundError: google` | Activate the venv: `source /path/to/infographic-builder-cc/.venv/bin/activate` |
-| Skill not found when typing `/infographic-builder:infographic` | Make sure you launched with `claude --plugin-dir /path/to/infographic-builder-cc` |
+| Skill not found when typing `/infographic-builder:infographic` | Make sure you installed the plugin: `/plugin marketplace add singh2/infographic-builder-cc` then `/plugin install infographic-builder@infographic-builder` |
 | Image text is garbled or unreadable | Simplify: fewer data points, shorter labels, larger text emphasis in your prompt |
 | Wrong layout for your content | Tell it explicitly: `"use a timeline layout"` or `"make it a comparison"` |
 | Too many panels (or too few) | Specify: `"make it a 2-panel infographic"` — explicit count always wins |
@@ -288,7 +310,8 @@ User: "Create an infographic about photosynthesis"
 ```
 infographic-builder-cc/
 |-- .claude-plugin/
-|   +-- plugin.json                # plugin manifest
+|   |-- plugin.json                # plugin manifest
+|   +-- marketplace.json           # marketplace manifest (for distribution)
 |-- skills/
 |   +-- infographic/
 |       +-- SKILL.md               # skill definition: workflow + design knowledge

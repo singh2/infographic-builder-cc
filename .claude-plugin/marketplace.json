@@ -1,0 +1,14 @@
+{
+  "name": "infographic-builder",
+  "owner": {
+    "name": "Gurkaran Singh"
+  },
+  "plugins": [
+    {
+      "name": "infographic-builder",
+      "source": "./",
+      "description": "Generate publication-ready infographics from any topic using Gemini image generation",
+      "version": "0.1.0"
+    }
+  ]
+}
