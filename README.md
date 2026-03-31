@@ -45,7 +45,7 @@ This is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin t
 Run these in Claude Code (one-time setup):
 
 ```
-/plugin marketplace add singh2/infographic-builder-cc
+/plugin marketplace add https://github.com/singh2/infographic-builder-cc.git
 /plugin install infographic-builder@infographic-builder
 ```
 
@@ -294,7 +294,7 @@ User: "Create an infographic about photosynthesis"
 |---------|-----|
 | `GOOGLE_API_KEY` error | `export GOOGLE_API_KEY=your-key` — the #1 first-run issue |
 | `ModuleNotFoundError: google` | Activate the venv: `source /path/to/infographic-builder-cc/.venv/bin/activate` |
-| Skill not found when typing `/infographic-builder:infographic` | Make sure you installed the plugin: `/plugin marketplace add singh2/infographic-builder-cc` then `/plugin install infographic-builder@infographic-builder` |
+| Skill not found when typing `/infographic-builder:infographic` | Make sure you installed the plugin: `/plugin marketplace add https://github.com/singh2/infographic-builder-cc.git` then `/plugin install infographic-builder@infographic-builder` |
 | Image text is garbled or unreadable | Simplify: fewer data points, shorter labels, larger text emphasis in your prompt |
 | Wrong layout for your content | Tell it explicitly: `"use a timeline layout"` or `"make it a comparison"` |
 | Too many panels (or too few) | Specify: `"make it a 2-panel infographic"` — explicit count always wins |
