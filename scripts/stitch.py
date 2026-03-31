@@ -47,7 +47,9 @@ def stitch(panel_paths: list[str], output_path: str, direction: str = "vertical"
     combined.save(str(out), "PNG")
 
     label = "vertically" if direction == "vertical" else "horizontally"
-    print(f"Stitched {len(images)} panels {label} -> {output_path} ({total_width}x{total_height}px)")
+    print(
+        f"Stitched {len(images)} panels {label} -> {output_path} ({total_width}x{total_height}px)"
+    )
 
 
 def main():
