@@ -42,10 +42,15 @@ This is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin t
 
 ### 2. Install the plugin
 
-Run these in Claude Code (one-time setup):
+Run these in Claude Code one at a time (one-time setup):
 
+**Step 1 — Add the marketplace:**
 ```
 /plugin marketplace add https://github.com/singh2/infographic-builder-cc.git
+```
+
+**Step 2 — Install the plugin:**
+```
 /plugin install infographic-builder@infographic-builder
 ```
 
