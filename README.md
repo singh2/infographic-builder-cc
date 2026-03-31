@@ -15,7 +15,7 @@
 
 <br>
 
-This is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that brings the design system from [infographic-builder](https://github.com/gsingh2/infographic-builder) (originally built for Microsoft Amplifier) to Claude Code as a slash command.
+This is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that brings the design system from [infographic-builder](https://github.com/singh2/infographic-builder) (originally built for Microsoft Amplifier) to Claude Code as a slash command.
 
 ## Contents
 
@@ -45,7 +45,7 @@ You need three things:
 ### 2. Clone and install
 
 ```bash
-git clone https://github.com/gsingh2/infographic-builder-cc.git
+git clone https://github.com/singh2/infographic-builder-cc.git
 cd infographic-builder-cc
 python3 -m venv .venv
 source .venv/bin/activate
@@ -170,7 +170,7 @@ Dense topics are automatically split into up to 6 panels. The hard part is keepi
 
 Every infographic goes through a self-critique loop on 5 dimensions before delivery. If issues are found, the agent refines and regenerates (max once).
 
-The design system behind this plugin was developed and validated using a **standalone evaluation harness** (in the [upstream repo](https://github.com/gsingh2/infographic-builder)) that batch-tests across 23 scenarios using vision-model scoring.
+The design system behind this plugin was developed and validated using a **standalone evaluation harness** (in the [upstream repo](https://github.com/singh2/infographic-builder)) that batch-tests across 23 scenarios using vision-model scoring.
 
 <details>
 <summary>Scoring rubric and evaluation background</summary>
@@ -195,7 +195,7 @@ If issues are found, the agent refines the prompt to address *only* the specific
 
 ### Evaluation harness (upstream)
 
-The [infographic-builder](https://github.com/gsingh2/infographic-builder) repo includes a full evaluation harness that was used to develop and validate the design system this plugin uses:
+The [infographic-builder](https://github.com/singh2/infographic-builder) repo includes a full evaluation harness that was used to develop and validate the design system this plugin uses:
 
 - **23 test scenarios** across 3 tiers: Specified (full visual spec in prompt), Natural (conversational requests), and Aesthetic (named curated styles)
 - **Panel counts from 1-6** covering single-panel through complex multi-panel compositions
